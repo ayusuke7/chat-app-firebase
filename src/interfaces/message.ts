@@ -3,5 +3,5 @@ export interface IMessage {
   name: string;
   text: string;
   type: number;
-  timestamp: string;
+  timestamp?: string;
 }

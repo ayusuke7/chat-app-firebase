@@ -1,20 +1,23 @@
-import { useAuthState } from "react-firebase-hooks/auth";
-import { auth, signIn, signOut } from "./FirebaseUtil";
-import { ListChats } from "./pages/ListChats";
-import { ChatPage } from "./pages/ChatPage";
 import { useState } from "react";
+import { ListChats } from "./components/ListChats";
+import { ChatPage } from "./components/ChatPage";
+import { useAuthState } from "react-firebase-hooks/auth";
+import firebaseService from "./utils/FirebaseUtils";
 import "./App.css";
 
 export default function App() {
   const [isAdm, setIsAdm] = useState(false);
   const [chatId, setChatId] = useState("");
 
-  const [user] = useAuthState(auth);
+  const [user] = useAuthState(firebaseService.auth);
 
   const signAdmn = async () => {
-    signIn().then(() => {
-      setIsAdm(true);
-    });
+    await firebaseService.signIn();
+    setIsAdm(true);
+  };
+
+  const signUser = async () => {
+    await firebaseService.signIn();
   };
 
   const render = () => {
@@ -43,7 +46,7 @@ export default function App() {
     return (
       <div className="buttons">
         <button onClick={signAdmn}>LOGIN ADMIN</button>
-        <button onClick={signIn}>LOGIN CLIENT</button>
+        <button onClick={signUser}>LOGIN CLIENT</button>
       </div>
     );
   };

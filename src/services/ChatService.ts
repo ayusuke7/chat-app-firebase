@@ -4,35 +4,63 @@ import {
   set,
   push,
   child,
+  remove,
   onValue,
   onChildAdded,
   DatabaseReference,
   DataSnapshot,
   Unsubscribe,
-  remove,
 } from "firebase/database";
-import { database } from "./FirebaseUtil";
-import { IChat } from "./interfaces/chat";
-import { IMessage } from "./interfaces/message";
-import { v4 as uuid } from "uuid";
+import { IChat } from "../interfaces/chat";
+import { IMessage } from "../interfaces/message";
+import firebaseUtils from "../utils/FirebaseUtils";
 
 export class ChatService {
+  private readonly nodeChat: string = "chats";
+  private readonly nodeMessages: string = "messages";
+
   public rootRef: DatabaseReference;
 
   constructor() {
-    this.rootRef = ref(database, "chats");
+    this.rootRef = ref(firebaseUtils.database, this.nodeChat);
   }
 
-  async createChat(data: IMessage): Promise<string> {
-    const chatId = uuid();
-    const newChat = child(this.rootRef, chatId);
-    await set(push(newChat), data);
-    return chatId;
+  private mapChat(data: any): IChat {
+    const messages = data["messages"];
+    return {
+      email: data["email"],
+      chatId: data["chatId"],
+      asunto: data["assunto"],
+      userName: data["userName"],
+      messages: Object.keys(messages).map((k) => {
+        const m = messages[k] as IMessage;
+        m.id = k;
+        return m;
+      }),
+    } as IChat;
+  }
+
+  async createChat(data: IChat): Promise<void> {
+    data.timestamp = new Date().toJSON();
+    const newChat = child(this.rootRef, `${data.chatId}`);
+    return await set(newChat, data);
   }
 
   async removeChat(chatKey: string): Promise<void> {
     const chatRef = child(this.rootRef, chatKey);
     return remove(chatRef);
+  }
+
+  async getChat(chatKey: string): Promise<IChat | null> {
+    const chatRef = child(this.rootRef, chatKey);
+    const snapshot = await get(chatRef);
+
+    if (snapshot.exists()) {
+      const data = await snapshot.val();
+      return this.mapChat(data);
+    }
+
+    return null;
   }
 
   async getChats(): Promise<IChat[]> {
@@ -42,12 +70,7 @@ export class ChatService {
     if (snapshot.exists()) {
       snapshot.forEach((chat: DataSnapshot) => {
         const data = chat.val();
-        const messages = Object.keys(data).map((k) => {
-          const m = data[k] as IMessage;
-          m.id = k;
-          return m;
-        });
-        chats.push({ chatId: chat.key, messages });
+        chats.push(this.mapChat(data));
       });
     }
 
@@ -55,7 +78,7 @@ export class ChatService {
   }
 
   async getMessages(chatKey: string): Promise<IMessage[]> {
-    const chatRef = child(this.rootRef, chatKey);
+    const chatRef = child(this.rootRef, `${chatKey}/${this.nodeMessages}`);
     const snapshot = await get(chatRef);
 
     if (snapshot.exists()) {
@@ -66,13 +89,14 @@ export class ChatService {
   }
 
   async sendMessage(chatKey: string, data: IMessage): Promise<void> {
-    const chat = child(this.rootRef, chatKey);
-    const newMessage = push(chat);
+    data.timestamp = new Date().toJSON();
+    const chatRef = child(this.rootRef, `${chatKey}/${this.nodeMessages}`);
+    const newMessage = push(chatRef);
     return set(newMessage, data);
   }
 
   onAddMessage(chatKey: string, onAdd: (data: IMessage) => void): Unsubscribe {
-    const chatRef = child(this.rootRef, chatKey);
+    const chatRef = child(this.rootRef, `${chatKey}/messages`);
     const callback = (data: DataSnapshot) => {
       onAdd(data.val() as IMessage);
     };

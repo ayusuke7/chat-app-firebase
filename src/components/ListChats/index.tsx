@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { ChatService } from "../../ChatService";
+import { ChatService } from "../../services/ChatService";
 import { IChat } from "../../interfaces/chat";
 
 import "./styles.css";

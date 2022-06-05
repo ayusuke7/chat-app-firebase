@@ -1,11 +1,11 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { Unsubscribe } from "firebase/database";
-import { ChatService } from "../../ChatService";
+import { ChatService } from "../../services/ChatService";
+import { formatDateTime } from "../../utils/Helpers";
 import { IMessage } from "../../interfaces/message";
-import { signOut } from "../../FirebaseUtil";
 import { User } from "firebase/auth";
 
+import firebaseUtil from "../../utils/FirebaseUtils";
 import "./styles.css";
 
 const chatService = new ChatService();
@@ -22,11 +22,29 @@ const ChatPage: React.FC<ChatProps> = ({ chatId, user, onLogout }) => {
   const [text, setText] = useState<string>("");
   const [messages, setMessages] = useState<IMessage[]>([]);
 
+  const createChat = useCallback(async () => {
+    const chat = await chatService.getChat(chatId);
+    console.log(chat);
+
+    if (!chat) {
+      await chatService.createChat({
+        chatId,
+        email: `${user?.email}`,
+        userName: `${user?.displayName}`,
+      });
+    }
+
+    /* Listenner */
+    chatService.onAddMessage(chatId, (message: IMessage) => {
+      console.log(message);
+      setMessages((prev) => prev.concat(message));
+    });
+  }, [chatId, user]);
+
   const sendMessage = async (e: any) => {
     if (text.length > 0) {
       try {
         const data: IMessage = {
-          timestamp: new Date().toJSON(),
           name: `${user?.displayName}`,
           type: user ? 1 : 2,
           text: text,
@@ -39,45 +57,38 @@ const ChatPage: React.FC<ChatProps> = ({ chatId, user, onLogout }) => {
     }
   };
 
-  const startChat = async () => {
-    chatSubs = chatService.onChangeMessage(chatId, (messages: IMessage[]) => {
-      console.log(messages);
-      setMessages([...messages]);
-    });
-  };
-
   const logout = async (e: any) => {
-    if (user) await signOut();
+    if (user) await firebaseUtil.signOut();
 
     if (chatSubs) chatSubs();
 
     if (onLogout) onLogout();
   };
 
-  const formatDate = (dateTime: string) => {
-    const [date, time] = dateTime.split("T");
-    //${date.split("-").reverse().slice(0, 2).join("/")}
-
-    return `
-    ${time.substring(0, 8)}
-    `;
-  };
-
   useEffect(() => {
-    startChat();
-  }, []);
+    return () => {
+      createChat();
+    };
+  }, [createChat]);
 
   return (
     <div className="chat-container">
       {/* <img src={`${user.photoURL}`} alt="foto" /> */}
 
-      <h4>ID: {chatId}</h4>
-
       {user && (
-        <>
-          <h4>NAME: {user.displayName}</h4>
-          <h4>EMAIL: {user.email}</h4>
-        </>
+        <div className="contact">
+          <div className="pic">
+            <img src={`${user?.photoURL}`} alt="" />
+          </div>
+          <div className="content">
+            <div className="name">{user?.displayName}</div>
+            <div className="seen">{user?.email}</div>
+            <div className="seen">{user?.uid}</div>
+          </div>
+          <div className="exit">
+            <button onClick={logout}>LOGOUT</button>
+          </div>
+        </div>
       )}
 
       <div className="messages">
@@ -92,8 +103,8 @@ const ChatPage: React.FC<ChatProps> = ({ chatId, user, onLogout }) => {
               <div>
                 <div className="text">{message.text}</div>
                 <div className="time">
-                  <span>{message.name}</span>
-                  <span>{formatDate(message.timestamp)}</span>
+                  {/* <span>{message.name}</span> */}
+                  <span>{formatDateTime(message.timestamp, true)}</span>
                 </div>
               </div>
             </div>
@@ -105,18 +116,13 @@ const ChatPage: React.FC<ChatProps> = ({ chatId, user, onLogout }) => {
         <input
           type="text"
           name="message"
+          placeholder="Digite o texto aqui..."
           onChange={({ target }) => {
             setText(target.value);
           }}
         />
         <button onClick={sendMessage}>ENVIAR</button>
       </div>
-
-      {user && (
-        <div className="login">
-          <button onClick={logout}>LOGOUT</button>
-        </div>
-      )}
     </div>
   );
 };

@@ -1,0 +1,28 @@
+
+
+.chats  {
+    margin-bottom: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.chats .item {
+    display: flex;
+}
+
+.chats .item .chat {
+    width: 400px;
+    height: 35px;
+    margin-bottom: 10px;
+    background-color: white;
+    margin-right: 5px;
+}
+
+.chats .item .remove {
+    border: none;
+    width: 50px;
+    height: 35px;
+    background-color: red;
+    color: white;
+}

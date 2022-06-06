@@ -10,14 +10,14 @@ import {
 } from "firebase/auth";
 
 const app: FirebaseApp = initializeApp({
-  apiKey: "AIzaSyBlpexurl1JFu9Mu-J8pi3OD86H5TPh2Ug",
-  authDomain: "maisigrejas-309914.firebaseapp.com",
-  databaseURL: "https://maisigrejas-309914-default-rtdb.firebaseio.com",
-  projectId: "maisigrejas-309914",
-  storageBucket: "maisigrejas-309914.appspot.com",
-  messagingSenderId: "682672102837",
-  appId: "1:682672102837:web:5ea915d3daa93e57200dfc",
-  measurementId: "G-LTS3C092TY",
+  apiKey: process.env.REACT_APP_APIKEY,
+  authDomain: process.env.REACT_APP_AUTHDOMAIN,
+  databaseURL: process.env.REACT_APP_DATABASE_URL,
+  projectId: process.env.REACT_APP_PROJECT_IT,
+  storageBucket: process.env.REACT_APP_STORAGE_BUCKET,
+  messagingSenderId: process.env.REACT_APP_MESSAGING_SENDER_ID,
+  appId: process.env.REACT_APP_APP_ID,
+  measurementId: process.env.REACT_APP_MEASUREMENT_ID,
 });
 
 class FirebaseUtils {

@@ -24,8 +24,6 @@ const ChatPage: React.FC<ChatProps> = ({ chatId, user, onLogout }) => {
 
   const createChat = useCallback(async () => {
     const chat = await chatService.getChat(chatId);
-    console.log(chat);
-
     if (!chat) {
       await chatService.createChat({
         chatId,
@@ -33,12 +31,14 @@ const ChatPage: React.FC<ChatProps> = ({ chatId, user, onLogout }) => {
         userName: `${user?.displayName}`,
       });
     }
-
     /* Listenner */
     chatService.onAddMessage(chatId, (message: IMessage) => {
-      console.log(message);
       setMessages((prev) => prev.concat(message));
     });
+
+    setTimeout(() => {
+      scrollToBottom();
+    }, 500);
   }, [chatId, user]);
 
   const sendMessage = async (e: any) => {
@@ -51,6 +51,7 @@ const ChatPage: React.FC<ChatProps> = ({ chatId, user, onLogout }) => {
         };
         await chatService.sendMessage(chatId, data);
         setText("");
+        scrollToBottom();
       } catch (error) {
         console.log(error);
       }
@@ -63,6 +64,11 @@ const ChatPage: React.FC<ChatProps> = ({ chatId, user, onLogout }) => {
     if (chatSubs) chatSubs();
 
     if (onLogout) onLogout();
+  };
+
+  const scrollToBottom = () => {
+    const scroll = document.getElementById("scroll");
+    scroll?.scrollIntoView({ behavior: "smooth" });
   };
 
   useEffect(() => {
@@ -110,6 +116,7 @@ const ChatPage: React.FC<ChatProps> = ({ chatId, user, onLogout }) => {
             </div>
           );
         })}
+        <div id="scroll"></div>
       </div>
 
       <div className="input">

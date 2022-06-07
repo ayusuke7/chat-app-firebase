@@ -4,6 +4,8 @@ This project was bootstrapped with [Create React App](https://github.com/faceboo
 
 ![screen app](./docs/captura.png)
 
+![screen app](./docs/captura2.png)
+
 ## Get started
 
 Before installing on your local machine, go create an account on [Firebase](https://firebase.google.com), after you've created an account, click the create project, then enter the project name, see example below
@@ -33,3 +35,28 @@ npm install
 ```
 
 after you've copied the firebase config object, create a `.env` file in the root of this project, copy the variable in `.env.example` file and paste it in `.env` file along with your firebase config, and you're ready.
+
+```env
+REACT_APP_APIKEY=<apiKey>
+REACT_APP_AUTHDOMAIN=<authDomain>
+REACT_APP_DATABASE_URL=<databaseUrl>
+REACT_APP_PROJECT_IT=<projectId>
+REACT_APP_STORAGE_BUCKET=<storageBucket>
+REACT_APP_MESSAGING_SENDER_ID=<senderId>
+REACT_APP_APP_ID=<appId>
+REACT_APP_MEASUREMENT_ID=<measurementId>
+REACT_APP_ADM_EMAIL=<adm_email>
+```
+
+## Rules Firebase Database
+
+```json {
+  "rules": {
+    "chats": {
+      ".read": true,
+      "$userId": {
+        ".write": "$userId === auth.uid || auth.token.email === '<admin_email>'"
+      }
+    }
+  }
+```

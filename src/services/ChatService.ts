@@ -1,3 +1,4 @@
+import { User } from "firebase/auth";
 import {
   ref,
   get,
@@ -27,21 +28,31 @@ export class ChatService {
 
   private mapChat(data: any): IChat {
     const messages = data["messages"];
+
     return {
       email: data["email"],
       chatId: data["chatId"],
-      asunto: data["assunto"],
+      photo: data["photo"],
       userName: data["userName"],
-      messages: Object.keys(messages).map((k) => {
-        const m = messages[k] as IMessage;
-        m.id = k;
-        return m;
-      }),
+      messages: messages
+        ? Object.keys(messages).map((k) => {
+            const m = messages[k] as IMessage;
+            m.id = k;
+            return m;
+          })
+        : [],
     } as IChat;
   }
 
-  async createChat(data: IChat): Promise<void> {
-    data.timestamp = new Date().toJSON();
+  async createChat(user: User | any): Promise<void> {
+    const data: IChat = {
+      email: `${user?.email}`,
+      chatId: `${user?.uid}`,
+      photo: `${user?.photoURL}`,
+      userName: `${user?.displayName}`,
+      timestamp: new Date().toJSON(),
+      messages: [],
+    };
     const newChat = child(this.rootRef, `${data.chatId}`);
     return await set(newChat, data);
   }
@@ -116,5 +127,29 @@ export class ChatService {
       onChange(messages);
     };
     return onValue(chatRef, callback);
+  }
+
+  onChangeChat(chatKey: string, onChange: (data?: IChat) => void): Unsubscribe {
+    const chatRef = child(this.rootRef, chatKey);
+    const callback = (data: DataSnapshot) => {
+      if (data.exists()) {
+        const chat: IChat = this.mapChat(data.val());
+        return onChange(chat);
+      }
+
+      return onChange();
+    };
+    return onValue(chatRef, callback);
+  }
+
+  onChangeChats(onChange: (data: IChat[]) => void): Unsubscribe {
+    const callback = (data: DataSnapshot) => {
+      const chats: IChat[] = [];
+      data.forEach((c) => {
+        chats.push(this.mapChat(c.val()));
+      });
+      onChange(chats);
+    };
+    return onValue(this.rootRef, callback);
   }
 }

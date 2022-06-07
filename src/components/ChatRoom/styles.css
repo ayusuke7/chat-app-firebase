@@ -1,16 +1,51 @@
 .chat-container {
-    max-width: 600px;
     margin: auto;
     background-color: white;
     border-radius: 12px;
+    display: flex;
 }
 
-.chat-container .title {
-    text-align: center;
+.chat-container .chats {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    padding: 0 10px;
+}
+
+.chat-container .chats .pic {
+    margin-bottom: 20px;
+   
+    position: relative;
+}
+
+.chat-container .chats .pic span {
+    background-color: red;
+    padding: 2.5px 5px;
+    border-radius: 50%;
+    position: absolute;
+    right: 0px;
+    top: -7px;
+    font-size: 11px;
+    color: white;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.chat-container .chats .pic img {
+    height: 60px;
+    width: 60px;
+    cursor: pointer;
+}
+
+.select img {
+    border: 3px solid greenyellow;
+    box-shadow: rgba(0, 0, 0, 0.19) 0px 8px 16px,
+                rgba(0, 0, 0, 0.23) 0px 4px 4px;
 }
 
 .chat-container .messages {
-    height: 400px;
+    height: var(--height);
     padding: 20px;
     flex-shrink: 2;
 	overflow-y: auto;
@@ -78,15 +113,11 @@
 .chat-container .input {
     display: flex;
     justify-content: center;
-}
-
-.chat-container .input {
     box-sizing: border-box;
     flex-basis: 4rem;
     flex-shrink: 0;
-    display: flex;
     align-items: center;
-    padding: 20px;
+    padding: 20px 20px 20px 0;
 }
 
 .chat-container .input input {
@@ -110,42 +141,33 @@
     color: #333;
 }
 
-.chat-container .buttons {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 100%;
-    margin-top: 20px;
-}
-
-.chat-container .buttons button {
-    height: 45px;
-    width: 150px;
-    margin-right: 5px;
-}
-
-.chat-container .login {
-    text-align: center;
-    margin-top: 20px;
+.button {
+    font-size: 1.75rem;
+    margin: 0 0.3rem;
+    cursor: pointer;
 }
 
 .chat-container .contact {
-    padding: 1.25rem;
+    padding: 1.25rem 1.25rem 1.25rem 0;
 	display: flex;
 	justify-content: space-between;
     align-items: center;
 
 }
 
-.chat-container .contact .pic img {
+.pic img {
     border-radius: 50%;
-    margin-right: 20px;
-    width: 80px;
-    height: 80px;
+    width: 70px;
+    height: 70px;
+}
+
+.chat-container .contact .pic img {
+    border: 1px solid lightgray;
 }
 
 .chat-container .contact .content {
     width: 100%;
+    margin: 0 15px;
 }
 
 .chat-container .contact .content .name {

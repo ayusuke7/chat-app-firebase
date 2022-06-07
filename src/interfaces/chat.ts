@@ -1,10 +1,10 @@
 import { IMessage } from "./message";
 
 export interface IChat {
+  messages: IMessage[];
   chatId: string | null;
   userName: string;
   email: string;
-  asunto?: string;
+  photo?: string;
   timestamp?: string;
-  messages?: IMessage[];
 }

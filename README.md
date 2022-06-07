@@ -1,4 +1,4 @@
-# A simple chat applicatoin with React/Typescript and Firebase Auth/Database
+# A simple chat application with React/Typescript and Firebase Auth/Database
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 

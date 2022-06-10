@@ -5,8 +5,9 @@ import {
   Auth,
   getAuth,
   signInWithPopup,
-  getRedirectResult,
   GoogleAuthProvider,
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
 } from "firebase/auth";
 
 const app: FirebaseApp = initializeApp({
@@ -20,7 +21,7 @@ const app: FirebaseApp = initializeApp({
   measurementId: process.env.REACT_APP_MEASUREMENT_ID,
 });
 
-class FirebaseUtils {
+class FirebaseService {
   private provider = new GoogleAuthProvider();
   public database: Database;
   public auth: Auth;
@@ -30,16 +31,26 @@ class FirebaseUtils {
     this.database = getDatabase(app);
   }
 
-  async getUser(): Promise<User | null> {
-    const credential = await getRedirectResult(this.auth);
-
-    if (credential) return credential.user;
-
-    return null;
+  async signInGoogle(): Promise<User> {
+    const credential = await signInWithPopup(this.auth, this.provider);
+    return credential.user;
   }
 
-  async signIn(): Promise<User> {
-    const credential = await signInWithPopup(this.auth, this.provider);
+  async signInEmail(email: string, password: string): Promise<User> {
+    const credential = await signInWithEmailAndPassword(
+      this.auth,
+      email,
+      password
+    );
+    return credential.user;
+  }
+
+  async createUserWithEmail(email: string, password: string): Promise<User> {
+    const credential = await createUserWithEmailAndPassword(
+      this.auth,
+      email,
+      password
+    );
     return credential.user;
   }
 
@@ -50,4 +61,4 @@ class FirebaseUtils {
   }
 }
 
-export default new FirebaseUtils();
+export default new FirebaseService();

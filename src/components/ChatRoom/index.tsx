@@ -1,23 +1,22 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { Unsubscribe } from "firebase/database";
-import { ChatService } from "../../services/ChatService";
 import { formatDateTime } from "../../utils/Helpers";
 import { IMessage } from "../../interfaces/message";
 import { User } from "firebase/auth";
 import { MdSend, MdExitToApp } from "react-icons/md";
 import { IChat } from "../../interfaces/chat";
 
-import firebaseUtil from "../../utils/FirebaseUtils";
-import "./styles.css";
+import firebaseService from "../../services/FirebaseService";
+import chatService from "../../services/ChatService";
 
-const chatService = new ChatService();
+import "./styles.scss";
 
 interface ChatProps {
   user: User | any;
   height?: number;
 }
 
-const ChatRoom: React.FC<ChatProps> = ({ user, height = 480 }) => {
+export const ChatRoom: React.FC<ChatProps> = ({ user, height = 480 }) => {
   let chatSub: Unsubscribe;
   let chatsSub: Unsubscribe;
 
@@ -43,7 +42,7 @@ const ChatRoom: React.FC<ChatProps> = ({ user, height = 480 }) => {
   };
 
   const logout = async () => {
-    if (user) await firebaseUtil.signOut();
+    if (user) await firebaseService.signOut();
 
     if (chatSub) chatSub();
 
@@ -195,5 +194,3 @@ const ChatRoom: React.FC<ChatProps> = ({ user, height = 480 }) => {
     </div>
   );
 };
-
-export { ChatRoom };

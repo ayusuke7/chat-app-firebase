@@ -14,16 +14,16 @@ import {
 } from "firebase/database";
 import { IChat } from "../interfaces/chat";
 import { IMessage } from "../interfaces/message";
-import firebaseUtils from "../utils/FirebaseUtils";
+import firebaseService from "./FirebaseService";
 
-export class ChatService {
+class ChatService {
   private readonly nodeChat: string = "chats";
   private readonly nodeMessages: string = "messages";
 
   public rootRef: DatabaseReference;
 
   constructor() {
-    this.rootRef = ref(firebaseUtils.database, this.nodeChat);
+    this.rootRef = ref(firebaseService.database, this.nodeChat);
   }
 
   private mapChat(data: any): IChat {
@@ -153,3 +153,5 @@ export class ChatService {
     return onValue(this.rootRef, callback);
   }
 }
+
+export default new ChatService();
